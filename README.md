@@ -31,23 +31,12 @@ be the mean temperature recorded on that day, at that airport.
     ## 
     ##     date
 
-    weather %>% mutate(day_of_year = yday(time_hour))
+    weather1 <- weather %>% mutate(day_of_year = yday(time_hour)) %>% 
+      group_by(origin, day_of_year) %>% 
+      summarize(meanTemp = mean(temp))
+    ggplot(data=weather1, aes(x=day_of_year, y=meanTemp, colour=origin), type="l")+geom_line()+facet_wrap(~origin)
 
-    ## # A tibble: 26,115 x 16
-    ##    origin  year month   day  hour  temp  dewp humid wind_dir wind_speed
-    ##    <chr>  <int> <int> <int> <int> <dbl> <dbl> <dbl>    <dbl>      <dbl>
-    ##  1 EWR     2013     1     1     1  39.0  26.1  59.4      270      10.4 
-    ##  2 EWR     2013     1     1     2  39.0  27.0  61.6      250       8.06
-    ##  3 EWR     2013     1     1     3  39.0  28.0  64.4      240      11.5 
-    ##  4 EWR     2013     1     1     4  39.9  28.0  62.2      250      12.7 
-    ##  5 EWR     2013     1     1     5  39.0  28.0  64.4      260      12.7 
-    ##  6 EWR     2013     1     1     6  37.9  28.0  67.2      240      11.5 
-    ##  7 EWR     2013     1     1     7  39.0  28.0  64.4      240      15.0 
-    ##  8 EWR     2013     1     1     8  39.9  28.0  62.2      250      10.4 
-    ##  9 EWR     2013     1     1     9  39.9  28.0  62.2      260      15.0 
-    ## 10 EWR     2013     1     1    10  41    28.0  59.6      260      13.8 
-    ## # … with 26,105 more rows, and 6 more variables: wind_gust <dbl>, precip <dbl>,
-    ## #   pressure <dbl>, visib <dbl>, time_hour <dttm>, day_of_year <dbl>
+![](README_files/figure-markdown_strict/unnamed-chunk-2-1.png)
 
 Make a non-tidy matrix of that data where each row is an airport and
 each column is a day of the year.
@@ -55,16 +44,16 @@ each column is a day of the year.
     weather %>% mutate(day_of_year = yday(time_hour)) %>% 
       drop_na(day_of_year) %>% 
       group_by(origin, day_of_year) %>% 
-      summarize(wind_speed = mean(wind_speed)) %>% 
-      spread(day_of_year, wind_speed)
+      summarize(temp = mean(temp)) %>% 
+      spread(day_of_year, temp)
 
     ## # A tibble: 3 x 365
     ## # Groups:   origin [3]
     ##   origin   `1`   `2`   `3`   `4`   `5`   `6`   `7`   `8`   `9`  `10`  `11`  `12`
     ##   <chr>  <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-    ## 1 EWR     13.2  10.9  8.58  14.0  9.40  9.11  7.34  7.19  5.99  8.92  4.79  5.03
-    ## 2 JFK     15.4  14.5 11.7   16.3 11.7  10.9   8.34 10.5   7.77 11.8   6.81  6.14
-    ## 3 LGA     15.4  13.6 11.1   15.4  9.88  9.76  9.06  8.34  8.87 11.8   7.58  6.43
+    ## 1 EWR     36.8  28.7  29.6  34.3  36.6  39.9  40.3  38.6  42.1  43.6  42.0  46.0
+    ## 2 JFK     36.9  28.6  30.1  34.7  36.8  39.3  40.1  39.4  42.7  43.6  41.3  45.0
+    ## 3 LGA     37.2  28.8  30.3  35.8  38.3  41.0  41.4  42.3  44.9  44.3  40.3  43.9
     ## # … with 352 more variables: `13` <dbl>, `14` <dbl>, `15` <dbl>, `16` <dbl>,
     ## #   `17` <dbl>, `18` <dbl>, `19` <dbl>, `20` <dbl>, `21` <dbl>, `22` <dbl>,
     ## #   `23` <dbl>, `24` <dbl>, `25` <dbl>, `26` <dbl>, `27` <dbl>, `28` <dbl>,
