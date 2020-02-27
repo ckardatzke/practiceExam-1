@@ -24,7 +24,11 @@ library(nycflights13)
 Make a plot with three facets, one for each airport in the weather data.  The x-axis should be the day of the year (1:365) and the y-axis should be the mean temperature recorded on that day, at that airport.
 ```{r}
 library(lubridate)
-weather %>% mutate(day_of_year = yday(time_hour))
+weather1 <- weather %>% mutate(day_of_year = yday(time_hour)) %>% 
+  group_by(origin, day_of_year) %>% 
+  summarize(meanTemp = mean(temp))
+ggplot(data=weather1, aes(x=day_of_year, y=meanTemp, colour=origin), type="l")+geom_line()+facet_wrap(~origin)
+
 ```
 
 
@@ -34,8 +38,8 @@ Make a non-tidy matrix of that data where each row is an airport and each column
 weather %>% mutate(day_of_year = yday(time_hour)) %>% 
   drop_na(day_of_year) %>% 
   group_by(origin, day_of_year) %>% 
-  summarize(wind_speed = mean(wind_speed)) %>% 
-  spread(day_of_year, wind_speed)
+  summarize(temp = mean(temp)) %>% 
+  spread(day_of_year, temp)
 
 ```
 
